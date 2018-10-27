@@ -64,13 +64,13 @@ def PairSubtract(samePairfilePath, datasetFilepath, outputFilePath,gsc= False):
     featuresList.to_csv(outputFilePath, index=False)
 
 
-def concatenateHOFCSVFiles(filepath1, filepath2, axisvalue):
+def concatenateHOFCSVFiles(filepath1, filepath2):
     diffPair_DF = pd.read_csv(filepath2, nrows=791)
     smPair_DF = pd.read_csv(filepath1)
     df = pd.concat([diffPair_DF, smPair_DF])
     df.to_csv('combined_HOF.csv', index=False)
 
-def concatenateGSCCSVFiles(filepath1, filepath2, axisvalue):
+def concatenateGSCCSVFiles(filepath1, filepath2):
     diffPair_DF = pd.read_csv(filepath2)
     smPair_DF = pd.read_csv(filepath1)
     smallSmlDF = smPair_DF.sample(n= 10000)
@@ -82,8 +82,8 @@ def concatenateGSCCSVFiles(filepath1, filepath2, axisvalue):
 
 
 if __name__ == '__main__':
-    concatenateGSCCSVFiles('//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//same_pairs.csv','//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//diffn_pairs.csv',0)
-    concatenateHOFCSVFiles('//Users//aman//Desktop//same_pairs.csv', '//Users//aman//Desktop//diffn_pairs.csv', 0)
+    concatenateGSCCSVFiles('//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//same_pairs.csv','//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//diffn_pairs.csv',)
+    concatenateHOFCSVFiles('//Users//aman//Desktop//same_pairs.csv', '//Users//aman//Desktop//diffn_pairs.csv')
     # GSC
     PairConcatenate('combined_GSC.csv', '//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//GSC-Features.csv', 'concatenate_GSC.csv',True)
     PairSubtract('combined_GSC.csv', '//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//GSC-Features.csv', 'sub_GSC.csv',True)
