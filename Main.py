@@ -30,7 +30,8 @@ def PairConcatenate(samePairfilePath, datasetFilepath, outputFilePath,gsc =False
         print('concat', count)
         count = count + 1
     featuresList = pd.DataFrame(finalList)
-    featuresList.to_csv(outputFilePath, index=False)
+    featuresList_NonZero = featuresList.loc[:, (featuresList != 0).any(axis=0)]
+    featuresList_NonZero.to_csv(outputFilePath, index=False)
 
 def PairSubtract(samePairfilePath, datasetFilepath, outputFilePath,gsc= False):
     smPair_DF = pd.read_csv(samePairfilePath)
@@ -61,7 +62,9 @@ def PairSubtract(samePairfilePath, datasetFilepath, outputFilePath,gsc= False):
 
         count = count + 1
     featuresList = pd.DataFrame(finalList)
-    featuresList.to_csv(outputFilePath, index=False)
+    featuresList_NonZero = featuresList.loc[:, (featuresList != 0).any(axis=0)]
+    featuresList_NonZero.to_csv(outputFilePath, index=False)
+
 
 
 def concatenateHOFCSVFiles(filepath1, filepath2):
@@ -76,6 +79,7 @@ def concatenateGSCCSVFiles(filepath1, filepath2):
     smallSmlDF = smPair_DF.sample(n= 10000)
     smallDiffDF = diffPair_DF.sample(n=10000)
     df = pd.concat([smallSmlDF, smallDiffDF])
+
     df.to_csv('combined_GSC.csv', index=False)
 
 
