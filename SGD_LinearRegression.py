@@ -233,13 +233,78 @@ def linearReggression( inputFilename ):
 
 
 
-def logisticRegression(inputFilePath):
 
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def loss(h, y):
+    print(h.shape)
+    print(y.shape)
+
+    temp = (-y * np.log(h) - (1 - y) * np.log(1 - h)).mean()
+    return temp
+
+
+
+def GenerateRawDataLogistic(filePath):
+    dataMatrix = []
+    with open(filePath, 'rU') as fi:
+        reader = csv.reader(fi)
+        next(reader)
+        for row in reader:
+            row = row[2:]
+            dataRow = []
+            for column in row:
+                dataRow.append(float(column))
+            dataMatrix.append(dataRow)
+    #dataMatrix = np.transpose(dataMatrix)
+    # print ("Data Matrix Generated..")
+    return dataMatrix
+
+
+
+def logisticRegression(inputFilePath):
+    import pandas as pd
+    raw_data = pd.read_csv(inputFilePath)
+    RawData = raw_data.iloc[:,2:20]
     RawTarget = GetTargetVector(inputFilePath)
-    RawData   = GenerateRawData(inputFilePath)
+    #RawData   = GenerateRawDataLogistic(inputFilePath)
+    theta = np.zeros(len(RawData.iloc[0]))
+    learning_rate = 0.01
+    L_Erms_TR = []
+    L_Erms_Test = []
+    z = np.dot(RawData, theta)
+    h = sigmoid(z)
+    sample = []
+    for i in range(0,10000):
+        RawTargetDF = pd.DataFrame(RawTarget)
+        temp =  h - RawTarget
+        gradient = np.dot(RawData.T , temp)/len(RawTarget)
+        theta = theta - learning_rate * gradient
+        z = np.dot(RawData, theta)
+        h = sigmoid(z)
+        sample.append(loss(h,np.array(RawTarget)))
+        #L_Erms_TR.append(Erms)
+
+    print("E_rms Testing    = " + str(np.around(min(sample), 5)))
+
+    plt.plot(np.arange(10000), sample)
+    plt.xlabel("Number of iterations")
+    plt.ylabel("ERMS -Test")
+    plt.show()
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
+    logisticRegression('concatenate_HOF.csv')
     linearReggression('concatenate_GSC.csv')
     linearReggression('sub_GSC.csv')
     linearReggression('concatenate_HOF.csv')
