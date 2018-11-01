@@ -3,6 +3,8 @@ import numpy as np
 import csv
 import math
 import matplotlib.pyplot as plt
+import pandas as pd
+import random as random
 
 
 def GenerateRawData(filePath, IsSynthetic = False):
@@ -25,13 +27,20 @@ def GetTargetVector(filePath):
     t = []
     with open(filePath, 'rU') as f:
         reader = csv.reader(f)
+        length =len(next(reader)) -1
         for row in reader:
-            t.append(int(row[20]))
+            t.append(int(row[length]))
     #print("Raw Training Generated..")
-    return t[1:]
+    return t
+
+def GenerateTrainingDataMatrix(rawData, TrainingPercent = 80):
+    T_len = int(math.ceil(len(rawData[0])*0.01*TrainingPercent))
+    d2 = rawData[:,0:T_len]
+    #print(str(TrainingPercent) + "% Training Data Generated..")
+    return d2
 
 
-def linearReggression( inputFilename ):
+def linearReggression( inputFilename):
 
     maxAcc = 0.0
     maxIter = 0
@@ -44,11 +53,6 @@ def linearReggression( inputFilename ):
     IsSynthetic = False
 
 
-    def GenerateTrainingDataMatrix(rawData, TrainingPercent = 80):
-        T_len = int(math.ceil(len(rawData[0])*0.01*TrainingPercent))
-        d2 = rawData[:,0:T_len]
-        #print(str(TrainingPercent) + "% Training Data Generated..")
-        return d2
 
     def GenerateValData(rawData, ValPercent, TrainingCount):
         valSize = int(math.ceil(len(rawData[0])*ValPercent*0.01))
@@ -154,7 +158,7 @@ def linearReggression( inputFilename ):
         return (str(accuracy) + ',' +  str(math.sqrt(sum/len(VAL_TEST_OUT))))
 
 
-    RawTarget = GetTargetVector(inputFilename)
+    RawTarget = GetTargetVector(inputFilename )
     RawData   = GenerateRawData(inputFilename,IsSynthetic)
 
     TrainingTarget = np.array(GenerateTrainingTarget(RawTarget,TrainingPercent))
@@ -238,9 +242,6 @@ def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
 def loss(h, y):
-    print(h.shape)
-    print(y.shape)
-
     temp = (-y * np.log(h) - (1 - y) * np.log(1 - h)).mean()
     return temp
 
@@ -263,32 +264,48 @@ def GenerateRawDataLogistic(filePath):
 
 
 
+
+def GenerateSubData(rawData, target, PercentDivision = 80):
+    T_len = int(math.ceil(len(target)*0.01*PercentDivision))
+    dfDataTrain = rawData.iloc[0:T_len,:]
+    dfDataTest = rawData.iloc[T_len:,:]
+    dfTargetTrain = target[:T_len]
+    dfTargetTest = target[T_len  : len(target)]
+    #print(str(TrainingPercent) + "% Training Data Generated..")
+    return dfDataTrain,dfTargetTrain, dfDataTest, dfTargetTest
+
+
+
+
 def logisticRegression(inputFilePath):
-    import pandas as pd
-    raw_data = pd.read_csv(inputFilePath)
-    RawData = raw_data.iloc[:,2:20]
-    RawTarget = GetTargetVector(inputFilePath)
-    #RawData   = GenerateRawDataLogistic(inputFilePath)
+    normalData = pd.read_csv(inputFilePath)
+    shuffleData = normalData.sample(frac=1)
+    shuffleData.to_csv('concat_shuffle', index=False)
+    RawTarget = GetTargetVector('concat_shuffle')
+    raw_data = pd.read_csv('concat_shuffle')
+
+    RawData = raw_data.iloc[:,3:21]
+    rawDataTraining,rawTargetTraining, rawDataTesting, rawTargetTesting = GenerateSubData(RawData, RawTarget)
+
     theta = np.zeros(len(RawData.iloc[0]))
     learning_rate = 0.01
-    L_Erms_TR = []
-    L_Erms_Test = []
-    z = np.dot(RawData, theta)
-    h = sigmoid(z)
-    sample = []
+    erms_Training = []
+    erms_Testing = []
     for i in range(0,10000):
-        RawTargetDF = pd.DataFrame(RawTarget)
-        temp =  h - RawTarget
-        gradient = np.dot(RawData.T , temp)/len(RawTarget)
+        z_train = np.dot(rawDataTraining, theta)
+        h_train = sigmoid(z_train)
+        temp =  h_train - rawTargetTraining
+        gradient = np.dot(rawDataTraining.T , temp)/len(rawTargetTraining)
         theta = theta - learning_rate * gradient
-        z = np.dot(RawData, theta)
-        h = sigmoid(z)
-        sample.append(loss(h,np.array(RawTarget)))
-        #L_Erms_TR.append(Erms)
+        erms_Training.append(loss(h_train,np.array(rawTargetTraining)))
+    z_test = np.dot(rawDataTesting, theta)
+    h_text = np.round(sigmoid(z_test))
+    accuracy = (h_text == rawTargetTesting).mean()*100
 
-    print("E_rms Testing    = " + str(np.around(min(sample), 5)))
 
-    plt.plot(np.arange(10000), sample)
+    print("E_rms Training    = " + str(np.around(min(erms_Training), 5)))
+    print("accuracy" + str(accuracy) + "%")
+    plt.plot(np.arange(10000), erms_Training)
     plt.xlabel("Number of iterations")
     plt.ylabel("ERMS -Test")
     plt.show()
@@ -299,15 +316,11 @@ def logisticRegression(inputFilePath):
 
 
 
-
-
-
-
 if __name__ == '__main__':
-    logisticRegression('concatenate_HOF.csv')
-    linearReggression('concatenate_GSC.csv')
+    #logisticRegression('concatenated_dataset.csv')
+    #linearReggression('concatenate_GSC.csv')
     linearReggression('sub_GSC.csv')
-    linearReggression('concatenate_HOF.csv')
-    linearReggression('sub_HOF.csv')
+    #linearReggression('concatenate_HOF.csv')
+    #linearReggression('sub_HOF.csv')
 
 

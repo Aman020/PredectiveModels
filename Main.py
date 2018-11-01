@@ -12,7 +12,6 @@ def PairConcatenate(samePairfilePath, datasetFilepath, outputFilePath,gsc =False
         imageidB = row['img_id_B']
         targetValue = str(row['target'])
         if gsc:
-
             hofimageADataA = hof_DF.loc[hof_DF['img_id'] == imageidA].iloc[0, 1:].values.T.tolist()
             hofimageADataB = hof_DF.loc[hof_DF['img_id'] == imageidB].iloc[0, 1:].values.T.tolist()
         else:
@@ -86,11 +85,11 @@ def concatenateGSCCSVFiles(filepath1, filepath2):
 
 
 if __name__ == '__main__':
-    concatenateGSCCSVFiles('//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//same_pairs.csv','//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//diffn_pairs.csv',)
-    concatenateHOFCSVFiles('//Users//aman//Desktop//same_pairs.csv', '//Users//aman//Desktop//diffn_pairs.csv')
+    #concatenateGSCCSVFiles('//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//same_pairs.csv','//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//diffn_pairs.csv',)
+    #concatenateHOFCSVFiles('//Users//aman//Desktop//same_pairs.csv', '//Users//aman//Desktop//diffn_pairs.csv')
     # GSC
-    PairConcatenate('combined_GSC.csv', '//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//GSC-Features.csv', 'concatenate_GSC.csv',True)
+    #PairConcatenate('combined_GSC.csv', '//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//GSC-Features.csv', 'concatenate_GSC.csv',True)
     PairSubtract('combined_GSC.csv', '//Users//aman//Desktop//GSC-Dataset//GSC-Features-Data//GSC-Features.csv', 'sub_GSC.csv',True)
     # HOF
-    PairSubtract('combined_HOF.csv', '//Users//aman//Desktop//hof.csv', 'sub_HOF.csv')
-    PairConcatenate('combined_HOF.csv', '//Users//aman//Desktop//hof.csv', 'concatenate_HOF.csv')
+    #PairSubtract('combined_HOF.csv', '//Users//aman//Desktop//hof.csv', 'sub_HOF.csv')
+    #PairConcatenate('combined_HOF.csv', '//Users//aman//Desktop//hof.csv', 'concatenate_HOF.csv')
